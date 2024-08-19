@@ -9,7 +9,7 @@ import sqlite3
 
 class BcptBscService:
     REPORT_TYPES = [
-        # 'Company Research', 
+        'Company Research', 
         'Sector Reports', 
         'Market Commentary',
         'Strategy',
@@ -18,7 +18,7 @@ class BcptBscService:
     ]
     
     LINKS_VI = [
-        # 'https://bvsc.com.vn/baocaophantich/99277?trang=1&sotin=12&culture=vi',
+        'https://bvsc.com.vn/baocaophantich/99277?trang=1&sotin=12&culture=vi',
         'https://bvsc.com.vn/baocaophantich/99278?trang=1&sotin=12&culture=vi',
         'https://bvsc.com.vn/baocaophantich/6390?trang=1&sotin=12&culture=vi',
         'https://bvsc.com.vn/baocaophantich/6391?trang=1&sotin=12&culture=vi',
