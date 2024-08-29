@@ -1,4 +1,3 @@
-import os
 import requests
 import time
 import pandas as pd
@@ -22,9 +21,9 @@ from bs4 import BeautifulSoup
 
 class BcptVndService:
     REPORT_TYPES = [
-        # "Company Research",
-        # "Sector Reports",
-        # "Economics",
+        "Company Research",
+        "Sector Reports",
+        "Economics",
         "Strategy",
         "Forex Report",
         "Real Estate Report",
@@ -32,9 +31,9 @@ class BcptVndService:
     ]
 
     LINKS_VI = [
-        # "https://www.vndirect.com.vn/category/bao-cao-phan-tich-dn/", # Company Research
-        # "https://www.vndirect.com.vn/category/bao-cao-nganh/", # Sector Reports
-        # "https://www.vndirect.com.vn/category/bao-cao-vi-mo-vi-chuyen-de-su-kien/", # Economics
+        "https://www.vndirect.com.vn/category/bao-cao-phan-tich-dn/", # Company Research
+        "https://www.vndirect.com.vn/category/bao-cao-nganh/", # Sector Reports
+        "https://www.vndirect.com.vn/category/bao-cao-vi-mo-vi-chuyen-de-su-kien/", # Economics
         "https://www.vndirect.com.vn/category/bao-cao-chien-luoc/",  # Strategy
         "https://www.vndirect.com.vn/category/thi-truong-tien-te/",  # Forex Report
         "https://www.vndirect.com.vn/category/bao-cao-nganh/thi-truong-bat-dong-san/",  # Real Estate Report
@@ -122,7 +121,7 @@ class BcptVndService:
                 print("Data inserted successfully!")
                 break
             except Exception as e:
-                print(f"Error: {e}")
+                print(f"Error inserting {data['headline']}: {e}")
                 retries -= 1
                 time.sleep(2)
 
@@ -238,7 +237,7 @@ class BcptVndService:
                     driver.switch_to.window(driver.window_handles[0])
 
         driver.quit()
-        print("Crawling VND Reports completed!")
+        print("Done VND!")
 
 
 # Connect to the SQLite

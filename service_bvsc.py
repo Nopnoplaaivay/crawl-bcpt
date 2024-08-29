@@ -12,20 +12,20 @@ from bs4 import BeautifulSoup as bs
 class BcptBscService:
     REPORT_TYPES = [
         "Company Research",
-        # 'Sector Reports',
-        # 'Market Commentary',
-        # 'Strategy',
-        # 'Economics',
-        # 'Bond Report'
+        'Sector Reports',
+        'Market Commentary',
+        'Strategy',
+        'Economics',
+        'Bond Report'
     ]
 
     LINKS_VI = [
         "https://bvsc.com.vn/baocaophantich/99277?trang=1&sotin=12&culture=vi",
-        # 'https://bvsc.com.vn/baocaophantich/99278?trang=1&sotin=12&culture=vi',
-        # 'https://bvsc.com.vn/baocaophantich/6390?trang=1&sotin=12&culture=vi',
-        # 'https://bvsc.com.vn/baocaophantich/6391?trang=1&sotin=12&culture=vi',
-        # 'https://bvsc.com.vn/baocaophantich/6392?trang=1&sotin=12&culture=vi',
-        # 'https://bvsc.com.vn/baocaophantich/99276?trang=1&sotin=12&culture=vi'
+        'https://bvsc.com.vn/baocaophantich/99278?trang=1&sotin=12&culture=vi',
+        'https://bvsc.com.vn/baocaophantich/6390?trang=1&sotin=12&culture=vi',
+        'https://bvsc.com.vn/baocaophantich/6391?trang=1&sotin=12&culture=vi',
+        'https://bvsc.com.vn/baocaophantich/6392?trang=1&sotin=12&culture=vi',
+        'https://bvsc.com.vn/baocaophantich/99276?trang=1&sotin=12&culture=vi'
     ]
 
     BASE_URL = "https://bvsc.com.vn"
@@ -44,7 +44,7 @@ class BcptBscService:
             file.write(response.content)
 
     @staticmethod
-    def insert_data(cursor, data, conn, retries=5):
+    def insert_data(cursor, data, conn, retries=3):
         """Insert data into the SQLite database with retries."""
         date_str = pd.Timestamp(data["date"]).strftime("%Y-%m-%d %H:%M:%S")
         insert_query = f"""
@@ -58,7 +58,7 @@ class BcptBscService:
                 print("Data inserted successfully!")
                 break
             except Exception as e:
-                print(f"Error: {e}")
+                print(f"Error inserting {data['headline']}: {e}")
                 retries -= 1
                 time.sleep(2)
 
@@ -84,7 +84,7 @@ class BcptBscService:
 
                     # Create metadata
                     data = {
-                        "source": "bsc",
+                        "source": "bvs",
                         "ticker": (
                             data_raw["maCK"]
                             if report_type == "Company Research"
@@ -101,7 +101,7 @@ class BcptBscService:
                         "content": bs(
                             data_raw["description"], "html.parser"
                         ).get_text(),
-                        "analyst": "",
+                        "analyst": None,
                         "language": "VI",
                         "linkWeb": cls.BASE_URL + data_raw["url"],
                         "linkDrive": None,

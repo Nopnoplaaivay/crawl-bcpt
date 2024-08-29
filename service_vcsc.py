@@ -27,24 +27,6 @@ class BcptVscsService:
         "Fixed Income",
     ]
 
-    # LINKS_EN = [
-    #     'https://iq.vietcap.com.vn/report?tab=company-research',
-    #     'https://iq.vietcap.com.vn/report?tab=sector-reports',
-    #     'https://iq.vietcap.com.vn/report?tab=market-commentary',
-    #     'https://iq.vietcap.com.vn/report?tab=macroeconomics',
-    #     'https://iq.vietcap.com.vn/report?tab=strategy',
-    #     'https://iq.vietcap.com.vn/report?tab=fixed-income'
-    # ]
-
-    # LINKS_VI = [
-    #     'https://iq.vietcap.com.vn/report?tab=phan-tich-doanh-nghiep',
-    #     'https://iq.vietcap.com.vn/report?tab=bao-cao-nganh',
-    #     'https://iq.vietcap.com.vn/report?tab=nhan-dinh-thi-truong',
-    #     'https://iq.vietcap.com.vn/report?tab=bao-cao-vi-mo',
-    #     'https://iq.vietcap.com.vn/report?tab=bao-cao-chien-luoc-dau-tu',
-    #     'https://iq.vietcap.com.vn/report?tab=bao-cao-trai-phieu-tien-te'
-    # ]
-
     BASE_URL = "https://www.vietcap.com.vn"
     API_URL = "https://www.vietcap.com.vn/api/cms-service/v1/page/analysis?is-all=false&page=0&size=10&direction=DESC&sortBy=date"
 
@@ -111,7 +93,7 @@ class BcptVscsService:
             cls.save_alternate_pdf(content) if content else print("No content")
 
     @staticmethod
-    def insert_data(cursor, data, conn, retries=5):
+    def insert_data(cursor, data, conn, retries=3):
         """Insert data into the SQLite database with retries."""
         date_str = pd.Timestamp(data["date"]).strftime("%Y-%m-%d %H:%M:%S")
         insert_query = f"""
@@ -125,19 +107,19 @@ class BcptVscsService:
                 print("Data inserted successfully!")
                 break
             except Exception as e:
-                print(f"Error: {e}")
+                print(f"Error inserting {data['headline']}: {e}")
                 retries -= 1
                 time.sleep(random.randint(1, 3))
 
     @staticmethod
     def get_data(cls, lang, page_id, report_type, cursor, conn):
-        """Get data from the page."""
+        """Get page numbers"""
         lang_idx = 1 if lang == "VI" else 2
         api_url = f"{cls.API_URL}&language={lang_idx}&page-ids={page_id}"
-        # print(api_url)
         res_json = requests.get(api_url).json()
         page_num = res_json["data"]["pagingGeneralResponses"]["totalPages"]
 
+        '''Iterate through pages and get data'''
         for page in range(page_num):
             print(f"Crawling page {page + 1} of {page_num}...")
             url = api_url.replace(f"page=0", f"page={page}")
@@ -175,12 +157,13 @@ class BcptVscsService:
                     "recommendation": reccomendation,
                     "headline": headline,
                     "content": detail,
-                    "analyst": "",
+                    "analyst": None,
                     "language": lang,
                     "linkWeb": linkWeb,
-                    "linkDrive": "",
+                    "linkDrive": None,
                 }
 
+                '''Download and insert data'''
                 # cls.download_pdf(cls, data_raw["file"], content)
                 cls.insert_data(cursor, data, conn)
                 print(f"Crawling {data['headline']}...")
@@ -193,10 +176,14 @@ class BcptVscsService:
             if lang == "VI":
                 for idx, page_id in enumerate(cls.PAGE_IDS_VI):
                     report_type = cls.REPORT_TYPES[idx]
+
+                    '''Download and insert data'''
                     cls.get_data(cls, lang, page_id, report_type, cursor, conn)
             else:
                 for idx, page_id in enumerate(cls.PAGE_IDS_EN):
                     report_type = cls.REPORT_TYPES[idx]
+
+                    '''Download and insert data'''
                     cls.get_data(cls, lang, page_id, report_type, cursor, conn)
 
 
