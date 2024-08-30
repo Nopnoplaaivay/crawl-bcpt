@@ -1,0 +1,10 @@
+requests
+pandas
+sqlite3
+beautifulsoup4
+validators
+pdfkit
+pdfplumber
+selenium
+webdriver-manager
+dateutil

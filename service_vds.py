@@ -15,9 +15,6 @@ config = pdfkit.configuration(
     wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
 )
 
-import traceback
-
-
 class BcptVdsService:
 
     REPORT_TYPE = [
