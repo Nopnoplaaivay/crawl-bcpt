@@ -37,7 +37,7 @@ class BcptBscService:
         if not file_name.endswith(".pdf"):
             file_name += ".pdf"
 
-        file_path = os.path.join("../bcpt_pdf/bvsc/", file_name)
+        file_path = os.path.join("./bcpt_pdf/bvsc/", file_name)
 
         with open(file_path, "wb") as file:
             response = requests.get(url, timeout=10)
