@@ -1,7 +1,7 @@
 requests
 pandas
 sqlite3
-beautifulsoup4
+bs4
 validators
 pdfkit
 pdfplumber
