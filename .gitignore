@@ -2,4 +2,5 @@ venv/
 .idea/
 templates/
 jupyter files/
+__pycache__/
 tempCodeRunnerFile.py
