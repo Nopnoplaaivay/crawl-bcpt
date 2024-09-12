@@ -8,6 +8,7 @@ import base64
 import io
 import logging
 import os
+import re
 
 from slugify import slugify
 from PIL import Image
@@ -71,7 +72,7 @@ class BcptVdsAPService:
 
         except Exception as e:
             Print.error(f"Error inserting {data['headline']}: {e}")
-            logging.error(f"VCBS - Error inserting {data['headline']}: {e}")
+            logging.error(f"VDS-AP - Error inserting {data['headline']}: {e}")
 
     @staticmethod
     def download_and_convert_image(url):
@@ -96,13 +97,14 @@ class BcptVdsAPService:
 
         for img_tag in content.find_all("img"):
             src = img_tag.get("src")
-            # print(f"Image URL: {src}")
+            '''Check valid src'''
+            if re.match(r'^(http|https|/|\.\/|data:image)', src) is None:
+                img_tag.decompose()
+                continue
 
             if src.startswith("./assets"):
                 img_tag["src"] = f"{base_url_vdsc}{src[1:]}"
                 # Print.warning(f"Add base_url before ./asset URL")
-            elif src.startswith("c./assets"):
-                img_tag.decompose()
             elif src.startswith("/data/api/app/file-storage/") or 'data:image' not in src:
                 if not src.startswith('data:image'):
                     img_tag["src"] = f"{base_url_vdsc}{src}" if src.startswith("/data/api") else src
@@ -112,9 +114,9 @@ class BcptVdsAPService:
                         img_tag["src"] = f"data:image/png;base64,{base64_image}"
                         # Print.success(f"Image converted to base64")
                     except Exception as e:
+                        print(img_tag["src"])
                         Print.error(f"Error converting webp to png: {e}")
-                        logging.error(f"VCBS - Error converting image to base64: {e}")
-
+                        logging.error(f"VDS-AP - Error converting image to base64: {e}")
 
         content_str = str(content)
         html_str = f"""
@@ -173,6 +175,7 @@ class BcptVdsAPService:
             res = requests.get(api_url).json()
             total_record = res["totalCount"]
 
+            # skip_count = 1434
             skip_count = 0
             while skip_count < total_record:
                 url = f"{api_url}&skipCount={skip_count}&maxResultCount=20"
@@ -268,8 +271,12 @@ class BcptVdsAPService:
 
                     """Download and insert data"""
                     time.sleep(random.randint(1, 2))
-                    cls.download_pdf(cls, content_html)
-                    cls.insert_data(cursor, data, conn)
+                    try:
+                        cls.download_pdf(cls, content_html)
+                        cls.insert_data(cursor, data, conn)
+                    except Exception as e:
+                        Print.error(f"Error crawling {data['linkWeb']}: {e}")
+                        logging.error(f"VDS-AP - Error crawling {data['linkWeb']}: {e}")
 
         print("Done VDS")
 
