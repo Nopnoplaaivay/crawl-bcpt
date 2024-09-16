@@ -25,7 +25,7 @@ config = pdfkit.configuration(
 class BcptVcbsService:
 
     REPORT_TYPES = [
-        # "Company Research",
+        "Company Research",
         "Sector Reports",
         "Market Commentary",
         "Futures",
@@ -33,7 +33,7 @@ class BcptVcbsService:
         "Bond Report",
     ]
 
-    REPORT_CODES = [ #"BCDN",
+    REPORT_CODES = ["BCDN",
                     "BCN",
                     "BCTT", 
                     "BCCKPS", 
@@ -113,8 +113,8 @@ class BcptVcbsService:
         if validators.url(download_link):
             response = requests.get(download_link)
             if response.status_code == 200:
-                # with open(f"./bcpt_pdf/vcbs/{headline}.pdf", "wb") as f:
-                with open(f"./bcpt_pdf/vcbs/metadata.pdf", "wb") as f:
+                with open(f"./bcpt_pdf/vcbs/{headline}.pdf", "wb") as f:
+                # with open(f"./bcpt_pdf/vcbs/metadata.pdf", "wb") as f:
                     f.write(response.content)
                 Print.success("PDF downloaded successfully!")
             else:
@@ -165,7 +165,7 @@ class BcptVcbsService:
         options.add_argument("disable-gpu")
         service = Service(executable_path=ChromeDriverManager().install())
         driver = webdriver.Chrome(options=options, service=service)
-        # driver = webdriver.Chrome(options=options)
+        driver = webdriver.Chrome(options=options)
         driver.set_page_load_timeout(30)
         print("Logging in VCBS...")
         driver.get(
